@@ -1,27 +1,23 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RETOAPI.Data;
 using RETOAPI.DTOs;
 using RETOAPI.Models;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+using RETOAPI.Services;
 
 namespace RETOAPI.Controllers
 {
-    [ApiController]
-    [Route("CLIENT")]
-    [EnableCors("_myAllowSpecificOrigins")]
-    public class ClientController : ControllerBase
+    public class UsersConrtroller:ControllerBase
     {
-        private readonly AppDbContext _conexionDB;
         private readonly IMapper _mapper;
-        public ClientController(AppDbContext conexionDB, IMapper mapper)
+        private readonly AppDbContext _conexionDB;
+        private readonly ServiceCredentials _serviceCredentials;
+        public UsersConrtroller(AppDbContext conexionDB, IMapper mapper, ServiceCredentials serviceCredentials)
         {
             _conexionDB = conexionDB;
             _mapper = mapper;
+            _serviceCredentials = serviceCredentials;
         }
         [HttpGet("ListAll")]
         public async Task<ActionResult> GetAllClient()
@@ -29,8 +25,8 @@ namespace RETOAPI.Controllers
             try
             {
                 var users = await _conexionDB.Users
-                    .Where(u => u.UserRols.Any(ur => ur.RolId == 2))
-                    .ToListAsync();
+                    .Include(u => u.UserRols)
+                    .ThenInclude(ur => ur.Rols).ToListAsync();
 
                 var clientList = _mapper.Map<List<UserList>>(users);
 
@@ -43,67 +39,66 @@ namespace RETOAPI.Controllers
             }
         }
         [HttpPost("Create")]
-        public async Task<ActionResult> CreateEmployee([FromBody] UserCreate clientcreate)
+        public async Task<ActionResult> CreateEmployee([FromBody] UserCreate userCreate)
         {
             try
             {
-                var client = _mapper.Map<Users>(clientcreate);
+                var Usuario = _mapper.Map<Users>(userCreate);
 
-                _conexionDB.Users.Add(client);
+                _conexionDB.Users.Add(Usuario);
                 await _conexionDB.SaveChangesAsync();
 
                 var userRole = new UserRole
                 {
-                    UserId = client.UserId,
-                    RolId = clientcreate.Rolid,
+                    UserId = Usuario.UserId,
+                    RolId = userCreate.Rolid,
                 };
-
                 _conexionDB.UserRoles.Add(userRole);
                 await _conexionDB.SaveChangesAsync();
 
-                return Ok(client);
+                return Ok(Usuario);
             }
             catch (Exception ex)
             {
-                // Log the exception (ex)
                 return StatusCode(500, "Internal server error");
             }
         }
         [HttpPut("Update")]
-        public async Task<ActionResult> UpdateEmployee([FromBody] UserUpdate clientUpdate)
+        public async Task<ActionResult> UpdateEmployee([FromBody] UserUpdate userUpdate)
         {
             try
             {
-                var employee = await _conexionDB.Users.FindAsync(clientUpdate.UserId);
-                if (employee == null)
+                var Usuario = await _conexionDB.Users.FindAsync(userUpdate.UserId);
+                if (Usuario == null)
                 {
                     return NotFound("User not found");
                 }
 
-                _mapper.Map(clientUpdate, employee);
+                // Mapea los cambios del objeto UserUpdate al objeto Users existente
+                _mapper.Map(userUpdate, Usuario);
 
-                _conexionDB.Users.Update(employee);
+                _conexionDB.Users.Update(Usuario);
                 await _conexionDB.SaveChangesAsync();
 
-                var userRole = await _conexionDB.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == clientUpdate.UserId);
+                var userRole = await _conexionDB.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == userUpdate.UserId);
                 if (userRole != null)
                 {
-                    userRole.RolId = clientUpdate.Rolid;
+                    userRole.RolId = userUpdate.Rolid;
                     _conexionDB.UserRoles.Update(userRole);
                 }
                 else
                 {
                     var newUserRole = new UserRole
                     {
-                        UserId = clientUpdate.UserId,
-                        RolId = clientUpdate.Rolid
+                        UserId = userUpdate.UserId,
+                        RolId = userUpdate.Rolid
                     };
                     _conexionDB.UserRoles.Add(newUserRole);
                 }
 
                 await _conexionDB.SaveChangesAsync();
 
-                return Ok(employee);
+                return Ok(Usuario);
             }
             catch (Exception ex)
             {
@@ -116,18 +111,19 @@ namespace RETOAPI.Controllers
         {
             try
             {
-                var employee = await _conexionDB.Users.FindAsync(id);
+                var employee = await _conexionDB.Users
+                    .Include(u => u.UserRols)
+                    .FirstOrDefaultAsync(u => u.UserId == id);
+
                 if (employee == null)
                 {
                     return NotFound("User not found");
                 }
 
-                var userRoles = await _conexionDB.UserRoles.Where(ur => ur.UserId == id).ToListAsync();
-                if (userRoles.Any())
-                {
-                    _conexionDB.UserRoles.RemoveRange(userRoles);
-                }
+                // Eliminar roles asociados
+                _conexionDB.UserRoles.RemoveRange(employee.UserRols);
 
+                // Eliminar el usuario
                 _conexionDB.Users.Remove(employee);
                 await _conexionDB.SaveChangesAsync();
 
@@ -139,6 +135,5 @@ namespace RETOAPI.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
     }
 }

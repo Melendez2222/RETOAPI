@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RETOAPI.Data;
 using RETOAPI.DTOs;
 using RETOAPI.Models;
+using RETOAPI.Services;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -16,35 +18,32 @@ namespace RETOAPI.Controllers
     public class EmployeeController:ControllerBase
     {
         private readonly AppDbContext _conexionDB;
-        public EmployeeController(AppDbContext conexionDB)
+        private readonly IMapper _mapper;
+        private readonly ServiceCredentials _serviceCredentials;
+        public EmployeeController(AppDbContext conexionDB, IMapper mapper, ServiceCredentials serviceCredentials)
         {
             _conexionDB = conexionDB;
+            _mapper = mapper;
+            _serviceCredentials = serviceCredentials;
         }
         [HttpGet("ListAll")]
         public async Task<ActionResult> GetAllEmployee()
         {
             try
             {
-                var Employee = await (from u in _conexionDB.Users
-                                    join ur in _conexionDB.UserRoles on u.UserId equals ur.UserId
-                                    join r in _conexionDB.Rols on ur.RolId equals r.RolId
-                                    where r.RolId != 2
-                                    select new UserList
-                                    {
-                                        UserId = u.UserId,
-                                        UserRucDni = u.UserRucDni,
-                                        UserName = u.UserName,
-                                        UserAddress = u.UserAddress,
-                                        UserEmail = u.UserEmail,
-                                        UserPhone = u.UserPhone,
-                                        UserActive = u.UserActive,
-                                        CreatedAt = u.CreatedAt,
+                var employees = await _conexionDB.Users
+                    .Include(u => u.UserRols)
+                    .ThenInclude(ur => ur.Rols)
+                    .Where(u => u.UserRols.Any(ur => ur.RolId != 2))
+                    .ToListAsync();
 
-                                    }).ToListAsync();
-                return Ok(Employee);
+                var employeeList = _mapper.Map<List<EmployeeList>>(employees);
+
+                return Ok(employeeList);
             }
             catch (Exception ex)
             {
+                // Log the exception (ex)
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -60,8 +59,8 @@ namespace RETOAPI.Controllers
                     UserAddress = employecreate.UserAddress,
                     UserEmail = employecreate.UserEmail,
                     UserPhone = employecreate.UserPhone,
-                    UserUsername = HashString(employecreate.UserUsername),
-                    UserPassword = HashString(employecreate.UserPassword),
+                    UserUsername = _serviceCredentials.HashString(employecreate.UserUsername),
+                    UserPassword = _serviceCredentials.HashString(employecreate.UserPassword),
 
                 };
                 var userRole = new UserRole
@@ -153,19 +152,6 @@ namespace RETOAPI.Controllers
             {
                 // Log the exception (ex)
                 return StatusCode(500, "Internal server error");
-            }
-        }
-        private string HashString(string input)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
-                var builder = new StringBuilder();
-                foreach (var b in bytes)
-                {
-                    builder.Append(b.ToString("x2"));
-                }
-                return builder.ToString();
             }
         }
     }

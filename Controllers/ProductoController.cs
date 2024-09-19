@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RETOAPI.Data;
@@ -16,26 +17,24 @@ namespace RETOAPI.Controllers
     public class ProductoController:ControllerBase
     {
         private readonly AppDbContext _conexionDB;
-        public ProductoController(AppDbContext conexionDB)
+        private readonly IMapper _mapper;
+        public ProductoController(AppDbContext conexionDB, IMapper mapper)
         {
             _conexionDB = conexionDB;
+            _mapper = mapper;
         }
         [HttpGet("ListAll")]
         public async Task<ActionResult> GetAllProducts()
         {
             try
             {
-                var products = await (from p in _conexionDB.Products
-                                      join c in _conexionDB.CategoryProducts on p.CatProductId equals c.CatProductId
-                                      select new ProductList { 
-                                        id_Product=p.Id_Product,
-                                        productCode=p.ProductCode,
-                                        productName=p.ProductName,
-                                        Category=c.CatProductName,
-                                        Price=p.Price,
-                                        Stock=p.Stock,
-                                      }).ToListAsync();
-                return Ok(products);
+                var products = await _conexionDB.Products
+                    .Include(p => p.CategoryProduct)
+                    .ToListAsync();
+
+                var productList = _mapper.Map<List<ProductList>>(products);
+
+                return Ok(productList);
             }
             catch (Exception ex)
             {
@@ -49,14 +48,7 @@ namespace RETOAPI.Controllers
         {
             try
             {
-                var product = new Product
-                {
-                    ProductCode = productCreate.ProductCode,
-                    ProductName = productCreate.ProductName,
-                    CatProductId = productCreate.CatProductId,
-                    Price = productCreate.Price,
-                    Stock = productCreate.Stock,
-                };
+                var product = _mapper.Map<Product>(productCreate);
 
                 _conexionDB.Products.Add(product);
                 await _conexionDB.SaveChangesAsync();
@@ -79,11 +71,8 @@ namespace RETOAPI.Controllers
                 {
                     return NotFound();
                 }
-                product.ProductCode = productUpdate.ProductCode;
-                product.ProductName = productUpdate.ProductName;
-                product.CatProductId = productUpdate.CatProductId;
-                product.Price = productUpdate.Price;
-                product.Stock = productUpdate.Stock;
+
+                _mapper.Map(productUpdate, product); 
 
                 await _conexionDB.SaveChangesAsync();
 
@@ -91,6 +80,7 @@ namespace RETOAPI.Controllers
             }
             catch (Exception ex)
             {
+                // Log the exception (ex)
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -99,9 +89,7 @@ namespace RETOAPI.Controllers
         {
             try
             {
-                var product = await (from p in _conexionDB.Products
-                                     where p.Id_Product == id
-                                     select p).FirstOrDefaultAsync();
+                var product = await _conexionDB.Products.FindAsync(id);
 
                 if (product == null)
                 {
@@ -115,6 +103,7 @@ namespace RETOAPI.Controllers
             }
             catch (Exception ex)
             {
+                // Log the exception (ex)
                 return StatusCode(500, "Internal server error");
             }
         }

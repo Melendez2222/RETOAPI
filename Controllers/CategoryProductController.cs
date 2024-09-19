@@ -25,8 +25,7 @@ namespace RETOAPI.Controllers
         {
             try
             {
-                var categories = await _conexionDB.CategoryProducts.ToListAsync();
-                var categoryList = _mapper.Map<List<CategoryProductList>>(categories);
+                var categoryList = _mapper.Map<List<CategoryProductList>>(await _conexionDB.CategoryProducts.ToListAsync());
                 return Ok(categoryList);
             }
             catch (Exception ex)
