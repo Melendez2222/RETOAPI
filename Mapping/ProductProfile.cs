@@ -7,8 +7,8 @@ namespace RETOAPI.Mapping
     public class ProductProfile:Profile
     {
         public ProductProfile() {
-            CreateMap<Users, UserList>()
-            .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.UserRols.FirstOrDefault().Rols.RolName));
+            CreateMap<Product, ProductList>()
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.CategoryProduct.CatProductName));
             CreateMap<ProductCreate,Product>();
             CreateMap<ProductUpdate, Product>();
         }

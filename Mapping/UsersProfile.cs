@@ -11,9 +11,11 @@ namespace RETOAPI.Mapping
     public class UsersProfile:Profile
     {
         private readonly ServiceCredentials _serviceCredentials;
-
+        public UsersProfile(ServiceCredentials serviceCredentials) { 
+            _serviceCredentials = serviceCredentials;
+        }
         public UsersProfile() {
-            _serviceCredentials = new ServiceCredentials();
+            
             //CreateMap<Users, UserList>();
             CreateMap<Users, UserList>()
                 .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.UserRols.FirstOrDefault().Rols.RolName));

@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using static RETOAPI.Services.ServiceCredentials;
 
 namespace RETOAPI.Controllers
 {
@@ -50,30 +51,15 @@ namespace RETOAPI.Controllers
                     var roleId = userRole?.RolId ?? 2;
                     var roleName = roleId == 2 ? "" : "AdmPanel";
 
-                    var claims = new[]
+                    var token = _serviceCredentials.GetToken(user.UserName, roleId);
+
+                    return Ok(new
                     {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, roleId.ToString())
-            };
-
-                    var keyString = _configuration["Jwt:Key"];
-                    if (string.IsNullOrEmpty(keyString))
-                    {
-                        return StatusCode(500, new { message = "JWT key is not configured properly." });
-                    }
-
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
-                    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                    var token = new JwtSecurityToken(
-                        issuer: _configuration["Jwt:Issuer"],
-                        audience: _configuration["Jwt:Audience"],
-                        claims: claims,
-                        expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
-                        signingCredentials: creds);
-
-                    return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token), id = user.UserId, role = roleName });
+                        token = token.Token,
+                        expires = token.Expires,
+                        id = user.UserId,
+                        role = roleName
+                    });
                 }
 
                 return Unauthorized();
