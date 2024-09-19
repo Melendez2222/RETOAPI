@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RETOAPI.Data;
@@ -13,22 +14,20 @@ namespace RETOAPI.Controllers
     public class CategoryProductController : ControllerBase
     {
         private readonly AppDbContext _conexionDB;
-        public CategoryProductController(AppDbContext conexionDB)
+        private readonly IMapper _mapper;
+        public CategoryProductController(AppDbContext conexionDB, IMapper mapper)
         {
             _conexionDB = conexionDB;
+            _mapper = mapper;
         }
         [HttpGet("ListAll")]
         public async Task<ActionResult> GetAllCategoryProduct()
         {
             try
             {
-                var Category = await (from c in _conexionDB.CategoryProducts 
-                                      select new CategoryProductList { 
-                                      CatProductId=c.CatProductId,
-                                      CatProductName=c.CatProductName,
-                                      CatProductActive=c.CatProductActive,
-                                      }).ToListAsync();
-                return Ok(Category);
+                var categories = await _conexionDB.CategoryProducts.ToListAsync();
+                var categoryList = _mapper.Map<List<CategoryProductList>>(categories);
+                return Ok(categoryList);
             }
             catch (Exception ex)
             {
