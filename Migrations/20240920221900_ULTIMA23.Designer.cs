@@ -12,8 +12,8 @@ using RETOAPI.Data;
 namespace RETOAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240917194158_AddAttempUsers")]
-    partial class AddAttempUsers
+    [Migration("20240920221900_ULTIMA23")]
+    partial class ULTIMA23
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,18 +36,14 @@ namespace RETOAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CatProductId"));
 
                     b.Property<bool>("CatProductActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasColumnType("bit");
 
                     b.Property<string>("CatProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("CatProductId");
 
@@ -64,16 +60,17 @@ namespace RETOAPI.Migrations
 
                     b.Property<string>("ClientID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("EmployeeID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("IGV")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("InvoiceNumber")
                         .ValueGeneratedOnAdd()
@@ -84,6 +81,9 @@ namespace RETOAPI.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Subtotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("InvoiceId");
@@ -107,7 +107,7 @@ namespace RETOAPI.Migrations
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("ProductPrice")
                         .HasColumnType("decimal(18,2)");
@@ -138,33 +138,32 @@ namespace RETOAPI.Migrations
                     b.Property<int>("CatProductId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CategoryProductCatProductId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("ProductActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasColumnType("bit");
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.HasKey("Id_Product");
 
-                    b.HasIndex("CatProductId");
+                    b.HasIndex("CategoryProductCatProductId");
 
                     b.ToTable("Product", (string)null);
                 });
@@ -178,14 +177,10 @@ namespace RETOAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolId"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("RolActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasColumnType("bit");
 
                     b.Property<string>("RolName")
                         .IsRequired()
@@ -198,20 +193,32 @@ namespace RETOAPI.Migrations
 
             modelBuilder.Entity("RETOAPI.Models.UserRole", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("idrelation")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("idrelation"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("RolId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                    b.Property<int>("RolsRolId")
+                        .HasColumnType("int");
 
-                    b.HasKey("UserId", "RolId");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("RolId");
+                    b.Property<int>("UsersUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("idrelation");
+
+                    b.HasIndex("RolsRolId");
+
+                    b.HasIndex("UsersUserId");
 
                     b.ToTable("UserRole", (string)null);
                 });
@@ -228,17 +235,10 @@ namespace RETOAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<int>("RolId1")
-                        .HasColumnType("int");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("UserActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserAddress")
                         .IsRequired()
@@ -254,22 +254,21 @@ namespace RETOAPI.Migrations
 
                     b.Property<string>("UserPassword")
                         .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserPhone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserRucDni")
-                        .HasColumnType("int");
+                    b.Property<string>("UserRucDni")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserUsername")
                         .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
-
-                    b.HasIndex("RolId1");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -296,8 +295,8 @@ namespace RETOAPI.Migrations
             modelBuilder.Entity("RETOAPI.Models.Product", b =>
                 {
                     b.HasOne("RETOAPI.Models.CategoryProduct", "CategoryProduct")
-                        .WithMany()
-                        .HasForeignKey("CatProductId")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryProductCatProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -308,13 +307,13 @@ namespace RETOAPI.Migrations
                 {
                     b.HasOne("RETOAPI.Models.Rols", "Rols")
                         .WithMany("UserRols")
-                        .HasForeignKey("RolId")
+                        .HasForeignKey("RolsRolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RETOAPI.Models.Users", "Users")
                         .WithMany("UserRols")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UsersUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -323,15 +322,9 @@ namespace RETOAPI.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("RETOAPI.Models.Users", b =>
+            modelBuilder.Entity("RETOAPI.Models.CategoryProduct", b =>
                 {
-                    b.HasOne("RETOAPI.Models.Rols", "RolId")
-                        .WithMany()
-                        .HasForeignKey("RolId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("RolId");
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("RETOAPI.Models.Rols", b =>
