@@ -6,7 +6,6 @@ namespace RETOAPI.Models
     public class Invoice
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int InvoiceId { get; set; }
         public int InvoiceNumber { get; set; }
         public required string ClientID { get; set; }
@@ -17,6 +16,6 @@ namespace RETOAPI.Models
         public decimal Total { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        
+        public virtual ICollection<Invoice> Invoices { get; set; }
     }
 }

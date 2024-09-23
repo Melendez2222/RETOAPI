@@ -6,7 +6,6 @@ namespace RETOAPI.Models
     public class CategoryProduct
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CatProductId { get; set; }
         public required string CatProductName { get; set; }
         public bool CatProductActive { get; set; } = true;

@@ -6,12 +6,13 @@ namespace RETOAPI.Models
     public class InvoiceDetail
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ItemId { get; set; }
+        [ForeignKey("Invoice")]
         public required int InvoiceID { get; set; }
-        public Invoice Invoice { get; set; }
+        public virtual Invoice Invoice { get; set; }
+        [ForeignKey("Product")]
         public required int ProductID { get; set; }
-        public Product Product { get; set; }
+        public virtual Product Product { get; set; }
         public required string ProductName { get; set; }
         public required decimal ProductPrice { get; set; }
         public required int Quantity { get; set; }

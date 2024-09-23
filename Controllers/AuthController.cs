@@ -48,7 +48,7 @@ namespace RETOAPI.Controllers
                 if (user != null)
                 {
                     var userRole = user.UserRols.FirstOrDefault();
-                    var roleId = userRole?.RolId ?? 2;
+                    var roleId = userRole?.idrelation ?? 2;
                     var roleName = roleId == 2 ? "" : "AdmPanel";
 
                     var token = _serviceCredentials.GetToken(user.UserName, roleId);

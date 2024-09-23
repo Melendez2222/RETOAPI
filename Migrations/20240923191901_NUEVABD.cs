@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RETOAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class ULTIMA23 : Migration
+    public partial class NUEVABD : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -42,11 +42,17 @@ namespace RETOAPI.Migrations
                     PercentageIGV = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IGV = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    InvoiceId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Invoice", x => x.InvoiceId);
+                    table.ForeignKey(
+                        name: "FK_Invoice_Invoice_InvoiceId1",
+                        column: x => x.InvoiceId1,
+                        principalTable: "Invoice",
+                        principalColumn: "InvoiceId");
                 });
 
             migrationBuilder.CreateTable(
@@ -95,7 +101,6 @@ namespace RETOAPI.Migrations
                     ProductCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CatProductId = table.Column<int>(type: "int", nullable: false),
-                    CategoryProductCatProductId = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Stock = table.Column<int>(type: "int", nullable: false),
                     ProductActive = table.Column<bool>(type: "bit", nullable: false),
@@ -105,8 +110,8 @@ namespace RETOAPI.Migrations
                 {
                     table.PrimaryKey("PK_Product", x => x.Id_Product);
                     table.ForeignKey(
-                        name: "FK_Product_CategoryProduct_CategoryProductCatProductId",
-                        column: x => x.CategoryProductCatProductId,
+                        name: "FK_Product_CategoryProduct_CatProductId",
+                        column: x => x.CatProductId,
                         principalTable: "CategoryProduct",
                         principalColumn: "CatProductId",
                         onDelete: ReferentialAction.Cascade);
@@ -119,23 +124,21 @@ namespace RETOAPI.Migrations
                     idrelation = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    UsersUserId = table.Column<int>(type: "int", nullable: false),
                     RolId = table.Column<int>(type: "int", nullable: false),
-                    RolsRolId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserRole", x => x.idrelation);
                     table.ForeignKey(
-                        name: "FK_UserRole_Rols_RolsRolId",
-                        column: x => x.RolsRolId,
+                        name: "FK_UserRole_Rols_RolId",
+                        column: x => x.RolId,
                         principalTable: "Rols",
                         principalColumn: "RolId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserRole_Users_UsersUserId",
-                        column: x => x.UsersUserId,
+                        name: "FK_UserRole_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
@@ -172,6 +175,11 @@ namespace RETOAPI.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Invoice_InvoiceId1",
+                table: "Invoice",
+                column: "InvoiceId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InvoiceDetail_InvoiceID",
                 table: "InvoiceDetail",
                 column: "InvoiceID");
@@ -182,19 +190,19 @@ namespace RETOAPI.Migrations
                 column: "ProductID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_CategoryProductCatProductId",
+                name: "IX_Product_CatProductId",
                 table: "Product",
-                column: "CategoryProductCatProductId");
+                column: "CatProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRole_RolsRolId",
+                name: "IX_UserRole_RolId",
                 table: "UserRole",
-                column: "RolsRolId");
+                column: "RolId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRole_UsersUserId",
+                name: "IX_UserRole_UserId",
                 table: "UserRole",
-                column: "UsersUserId");
+                column: "UserId");
         }
 
         /// <inheritdoc />

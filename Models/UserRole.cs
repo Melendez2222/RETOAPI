@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RETOAPI.Models
 {
@@ -6,10 +7,12 @@ namespace RETOAPI.Models
     {
         [Key]
         public int idrelation { get; set; }
+        [ForeignKey("Users")]
         public int UserId { get; set; }
-        public Users Users { get; set; }
+        public virtual Users Users { get; set; }
+        [ForeignKey("Rols")]
         public int RolId { get; set; }
-        public Rols Rols { get; set; }
+        public virtual Rols Rols { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     }

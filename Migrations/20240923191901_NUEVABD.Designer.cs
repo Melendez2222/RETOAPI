@@ -12,8 +12,8 @@ using RETOAPI.Data;
 namespace RETOAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240920221900_ULTIMA23")]
-    partial class ULTIMA23
+    [Migration("20240923191901_NUEVABD")]
+    partial class NUEVABD
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,6 +72,9 @@ namespace RETOAPI.Migrations
                     b.Property<decimal>("IGV")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("InvoiceId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("InvoiceNumber")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -87,6 +90,8 @@ namespace RETOAPI.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("InvoiceId");
+
+                    b.HasIndex("InvoiceId1");
 
                     b.ToTable("Invoice", (string)null);
                 });
@@ -138,9 +143,6 @@ namespace RETOAPI.Migrations
                     b.Property<int>("CatProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CategoryProductCatProductId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -163,7 +165,7 @@ namespace RETOAPI.Migrations
 
                     b.HasKey("Id_Product");
 
-                    b.HasIndex("CategoryProductCatProductId");
+                    b.HasIndex("CatProductId");
 
                     b.ToTable("Product", (string)null);
                 });
@@ -205,20 +207,14 @@ namespace RETOAPI.Migrations
                     b.Property<int>("RolId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RolsRolId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersUserId")
                         .HasColumnType("int");
 
                     b.HasKey("idrelation");
 
-                    b.HasIndex("RolsRolId");
+                    b.HasIndex("RolId");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserRole", (string)null);
                 });
@@ -273,6 +269,13 @@ namespace RETOAPI.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("RETOAPI.Models.Invoice", b =>
+                {
+                    b.HasOne("RETOAPI.Models.Invoice", null)
+                        .WithMany("Invoices")
+                        .HasForeignKey("InvoiceId1");
+                });
+
             modelBuilder.Entity("RETOAPI.Models.InvoiceDetail", b =>
                 {
                     b.HasOne("RETOAPI.Models.Invoice", "Invoice")
@@ -282,7 +285,7 @@ namespace RETOAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("RETOAPI.Models.Product", "Product")
-                        .WithMany()
+                        .WithMany("InvoiceDetails")
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -296,7 +299,7 @@ namespace RETOAPI.Migrations
                 {
                     b.HasOne("RETOAPI.Models.CategoryProduct", "CategoryProduct")
                         .WithMany("Products")
-                        .HasForeignKey("CategoryProductCatProductId")
+                        .HasForeignKey("CatProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -307,13 +310,13 @@ namespace RETOAPI.Migrations
                 {
                     b.HasOne("RETOAPI.Models.Rols", "Rols")
                         .WithMany("UserRols")
-                        .HasForeignKey("RolsRolId")
+                        .HasForeignKey("RolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RETOAPI.Models.Users", "Users")
                         .WithMany("UserRols")
-                        .HasForeignKey("UsersUserId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -325,6 +328,16 @@ namespace RETOAPI.Migrations
             modelBuilder.Entity("RETOAPI.Models.CategoryProduct", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("RETOAPI.Models.Invoice", b =>
+                {
+                    b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("RETOAPI.Models.Product", b =>
+                {
+                    b.Navigation("InvoiceDetails");
                 });
 
             modelBuilder.Entity("RETOAPI.Models.Rols", b =>

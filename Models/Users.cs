@@ -6,7 +6,6 @@ namespace RETOAPI.Models
     public class Users
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
         public required string UserRucDni { get; set; }
         public required string UserName { get; set; }
