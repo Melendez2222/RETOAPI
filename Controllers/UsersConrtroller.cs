@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace RETOAPI.Controllers
     [ApiController]
     [Route("USER")]
     [EnableCors("_myAllowSpecificOrigins")]
+    [Authorize]
     public class UsersConrtroller:ControllerBase
     {
         private readonly IMapper _mapper;

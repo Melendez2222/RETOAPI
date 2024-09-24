@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +43,7 @@ namespace RETOAPI.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
+        [Authorize]
         [HttpPost("Create")]
         public async Task<ActionResult> CreateProduct([FromBody] ProductCreate productCreate)
         {
@@ -61,6 +62,7 @@ namespace RETOAPI.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+        [Authorize]
         [HttpPut("Update")]
         public async Task<ActionResult> UpdateProduct([FromBody] ProductUpdate productUpdate)
         {
@@ -84,6 +86,7 @@ namespace RETOAPI.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+        [Authorize]
         [HttpDelete("Delete/{id}")]
         public async Task<ActionResult> DeleteProduct(int id)
         {

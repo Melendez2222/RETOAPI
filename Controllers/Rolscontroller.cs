@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RETOAPI.Data;
@@ -9,6 +10,7 @@ namespace RETOAPI.Controllers
     [ApiController]
     [Route("Rols")]
     [EnableCors("_myAllowSpecificOrigins")]
+    [Authorize]
     public class Rolscontroller:ControllerBase
     {
         private readonly AppDbContext _conexionDB;
