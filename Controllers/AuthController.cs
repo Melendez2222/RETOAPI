@@ -70,11 +70,7 @@ namespace RETOAPI.Controllers
                 return StatusCode(500, new { message = "Ocurrió un error al obtener el usuario", error = ex.Message });
             }
         }
-        [HttpGet("RefreshToken")]
-        [Authorize]
-        public async Task<IActionResult> tokenRefresh() { 
         
-        }
         
     }
 }
