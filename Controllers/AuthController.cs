@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -68,6 +69,11 @@ namespace RETOAPI.Controllers
             {
                 return StatusCode(500, new { message = "Ocurrió un error al obtener el usuario", error = ex.Message });
             }
+        }
+        [HttpGet("RefreshToken")]
+        [Authorize]
+        public async Task<IActionResult> tokenRefresh() { 
+        
         }
         
     }

@@ -58,7 +58,6 @@ namespace RETOAPI.Services
                 expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
                 signingCredentials: creds);
 
-            //return new JwtSecurityTokenHandler().WriteToken(token);
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
             var expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"]));
 
