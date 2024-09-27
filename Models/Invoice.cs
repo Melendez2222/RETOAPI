@@ -15,7 +15,6 @@ namespace RETOAPI.Models
         public decimal IGV { get; set; }
         public decimal Total { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-        public virtual ICollection<Invoice> Invoices { get; set; }
+        public virtual ICollection<InvoiceDetail> InvoiceDetails { get; set; }
     }
 }

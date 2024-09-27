@@ -18,5 +18,6 @@ namespace RETOAPI.Models
         public bool UserActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public  virtual ICollection<UserRole> UserRols { get; set; }
+        public virtual ICollection<CartUser> CartUsers{ get; set; }
     }
 }

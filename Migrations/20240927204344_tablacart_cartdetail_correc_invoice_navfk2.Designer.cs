@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RETOAPI.Data;
 
@@ -11,9 +12,11 @@ using RETOAPI.Data;
 namespace RETOAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240927204344_tablacart_cartdetail_correc_invoice_navfk2")]
+    partial class tablacart_cartdetail_correc_invoice_navfk2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,8 +41,17 @@ namespace RETOAPI.Migrations
                     b.Property<int>("IdCart")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("PriceCD")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
+
+                    b.Property<int>("QuantityCD")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SubtotalCD")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("IdItemCart");
 
@@ -60,6 +72,9 @@ namespace RETOAPI.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

@@ -49,6 +49,11 @@ namespace RETOAPI.Controllers
         {
             try
             {
+                var username = _serviceCredentials.HashString(userCreate.UserUsername);
+                var password=_serviceCredentials.HashString(userCreate.UserPassword);
+                userCreate.UserUsername = username;
+                userCreate.UserPassword = password;
+
                 var Usuario = _mapper.Map<Users>(userCreate);
 
                 _conexionDB.Users.Add(Usuario);

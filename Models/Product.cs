@@ -17,5 +17,6 @@ namespace RETOAPI.Models
         public bool ProductActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public virtual ICollection<InvoiceDetail> InvoiceDetails { get; set; }
+        public virtual ICollection<CartDetail> CartDetails { get; set; }
     }
 }

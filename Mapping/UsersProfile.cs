@@ -19,9 +19,7 @@ namespace RETOAPI.Mapping
             //CreateMap<Users, UserList>();
             CreateMap<Users, UserList>()
                 .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.UserRols.FirstOrDefault().Rols.RolName));
-            CreateMap<UserCreate, Users>()
-                .ForMember(dest => dest.UserUsername, opt => opt.MapFrom(src => _serviceCredentials.HashString(src.UserUsername)))
-                .ForMember(dest => dest.UserPassword, opt => opt.MapFrom(src => _serviceCredentials.HashString(src.UserPassword)));
+            CreateMap<UserCreate, Users>();
             CreateMap<UserUpdate,Users>();
         }
         
