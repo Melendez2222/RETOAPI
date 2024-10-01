@@ -16,6 +16,8 @@ namespace RETOAPI.Mapping
             CreateMap<CartItemDetail, CartDetail>()
                 .ForMember(dest => dest.IdCart, opt => opt.Ignore())
                 .ForMember(dest => dest.CreateAt, opt => opt.Ignore());
+            CreateMap<SearchCartByUser, CartUser>();
+            CreateMap<CartDetail,CartItemsList>();
         }
     }
 }
