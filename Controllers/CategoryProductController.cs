@@ -12,7 +12,6 @@ namespace RETOAPI.Controllers
     [ApiController]
     [Route("CATEGORY")]
     [EnableCors("_myAllowSpecificOrigins")]
-    [Authorize]
     public class CategoryProductController : ControllerBase
     {
         private readonly AppDbContext _conexionDB;

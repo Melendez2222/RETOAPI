@@ -18,6 +18,8 @@ namespace RETOAPI.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceDetail> InvoicesDetail { get; set; }
+        public DbSet<CartUser> CartUsers { get; set; }
+        public DbSet<CartDetail> CartDetail { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Users>().ToTable("Users");

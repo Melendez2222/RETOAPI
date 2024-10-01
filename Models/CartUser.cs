@@ -6,7 +6,7 @@ namespace RETOAPI.Models
     public class CartUser
     {
         [Key]
-        public required int IdCart { get; set; }
+        public int IdCart { get; set; }
         [ForeignKey("Users")]
         public required int UserId { get; set; }
         public virtual Users Users { get; set; }
