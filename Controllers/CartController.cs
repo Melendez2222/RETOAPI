@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -7,9 +10,11 @@ using RETOAPI.Data;
 using RETOAPI.DTOs;
 using RETOAPI.Models;
 using RETOAPI.Services;
+using System.Security.Claims;
 
 namespace RETOAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("Cart")]
     [EnableCors("_myAllowSpecificOrigins")]
@@ -19,15 +24,32 @@ namespace RETOAPI.Controllers
         private readonly AppDbContext _conexionDB;
         private readonly IMapper _mapper;
         private readonly ServiceCredentials _serviceCredentials;
-        public CartController(IConfiguration configuration, AppDbContext conexionDB, IMapper mapper, ServiceCredentials serviceCredentials)
+        private readonly UserManager<Users> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public CartController(IConfiguration configuration, AppDbContext conexionDB, IMapper mapper, ServiceCredentials serviceCredentials, UserManager<Users> userManager,IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
             _conexionDB = conexionDB;
             _mapper = mapper;
             _serviceCredentials = serviceCredentials;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
+        }
+        [HttpGet("GetUserId")]
+        public async Task<IActionResult> GetUserId()
+        {
+            // Obtener el ID del usuario del token
+            var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            if (user == null)
+            {
+                return Unauthorized("Invalid token");
+            }
+            int userId = user.UserId;
+            return Ok(userId);
         }
         [HttpPost("CartUser")]
-        public async Task<ActionResult> GetCartUser([FromBody] SearchCartByUser searchCartByUser) 
+        public async Task<ActionResult> GetCartUser([FromBody] SearchCartByUser searchCartByUser)
         {
             try
             {
@@ -45,23 +67,28 @@ namespace RETOAPI.Controllers
                 {
                     return Ok(); // No retornar nada si no existe el UserId en CartUser
                 }
-                // Buscar en CartDetail según CartId
                 var cartDetails = await _conexionDB.CartDetail
                     .Where(cd => cd.IdCart == cart.IdCart)
-                    .ToListAsync();
+                    .Select(cd => new
+                    {
+                        cd.ProductId,
+                        cd.Product.ProductName,
+                        cd.Product.ProductCode,
+                        cd.Quantity,
+                        cd.Product.Price
+                    })
+                    .ToListAsync(); 
 
                 if (cartDetails == null || !cartDetails.Any())
                 {
                     return NotFound("No se encontraron detalles del carrito.");
                 }
 
-                // Mapear a DTO usando AutoMapper
-                var cartDetailsDto = _mapper.Map<List<CartItemsList>>(cartDetails);
-
                 // Devolver los detalles del carrito
-                return Ok(cartDetailsDto);
+                return Ok(cartDetails);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -104,7 +131,7 @@ namespace RETOAPI.Controllers
                 }
 
                 await _conexionDB.SaveChangesAsync();
-               
+
                 return Ok(new { message = "Producto agregado exitosamente" });
             }
             catch (Exception ex)
@@ -206,5 +233,5 @@ namespace RETOAPI.Controllers
         }
 
     }
-    
+
 }

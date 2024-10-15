@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RETOAPI.Models
 {
-    public class Users
+    public class Users: IdentityUser
     {
         [Key]
         public int UserId { get; set; }

@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RETOAPI.Models;
 using System.Data;
 
 namespace RETOAPI.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<Users>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-
         }
         public DbSet<Users> Users { get; set; }
         public DbSet<Rols> Rols { get; set; }
@@ -20,6 +20,7 @@ namespace RETOAPI.Data
         public DbSet<InvoiceDetail> InvoicesDetail { get; set; }
         public DbSet<CartUser> CartUsers { get; set; }
         public DbSet<CartDetail> CartDetail { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Users>().ToTable("Users");
@@ -30,15 +31,14 @@ namespace RETOAPI.Data
             modelBuilder.Entity<Invoice>().ToTable("Invoice");
             modelBuilder.Entity<InvoiceDetail>().ToTable("InvoiceDetail");
 
-            
             modelBuilder.HasSequence<int>("InvoiceNumberSequence")
-            .StartsAt(1)
-            .IncrementsBy(1);
+                .StartsAt(1)
+                .IncrementsBy(1);
             modelBuilder.Entity<Invoice>()
                 .Property(f => f.InvoiceNumber)
                 .HasDefaultValueSql("NEXT VALUE FOR InvoiceNumberSequence");
-
         }
+
         public override int SaveChanges()
         {
             foreach (var entry in ChangeTracker.Entries<Invoice>())
@@ -64,6 +64,5 @@ namespace RETOAPI.Data
             }
             return base.SaveChanges();
         }
-        
     }
 }
